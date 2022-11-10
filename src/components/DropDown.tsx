@@ -34,7 +34,7 @@ export default DropDown;
 const Container = styled.ul`
   border-radius: 15px;
   background-color: ${({ theme }) => theme.color.white};
-  width: 30rem;
+  width: 40rem;
   margin-top: 0.5rem;
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -67,6 +67,7 @@ const SListItem = styled.li`
   display: flex;
   align-items: center;
   padding: 0.8rem;
+  overflow-wrap: break-word;
   &.selected {
     background-color: lightgray;
   }

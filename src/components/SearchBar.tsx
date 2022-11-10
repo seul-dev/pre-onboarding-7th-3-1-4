@@ -47,7 +47,7 @@ const SearchBar = () => {
 export default SearchBar;
 
 const SSearchBar = styled.form`
-  width: 30rem;
+  width: 40rem;
   height: 3rem;
   position: relative;
   & > input {
