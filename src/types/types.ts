@@ -4,3 +4,7 @@ export interface IDisease {
 }
 
 export type SearchResponse = Promise<IDisease[]>;
+
+export interface ICache {
+  [key: string]: IDisease[];
+}
