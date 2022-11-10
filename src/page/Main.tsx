@@ -2,13 +2,12 @@ import React from "react";
 import styled from "styled-components";
 import SearchBar from "@/components/SearchBar";
 import DropDown from "@/components/DropDown";
+import Title from "@/components/Title";
 
 const Main = () => {
   return (
     <Layout>
-      <Title>
-        <h1>국내 모든 임상시험 검색하고 온라인으로 참여하기</h1>
-      </Title>
+      <Title />
       <SearchBar />
       <DropDown />
     </Layout>
@@ -27,13 +26,4 @@ const Layout = styled.div`
   flex-direction: column;
   align-items: center;
   background-color: ${({ theme }) => theme.color.skyblue};
-`;
-
-const Title = styled.div`
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  text-align: center;
-  width: 22rem;
-  line-height: 2.3rem;
 `;

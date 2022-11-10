@@ -14,11 +14,10 @@ export class SearchServiceImpl implements SearchService {
   async search(keyword: string) {
     try {
       const { data } = await this.httpClient.request(`sick?q=${keyword}`);
-      console.info("calling api");
       return data;
     } catch (error) {
       if (error instanceof AxiosError) {
-        throw new Error("에러가 발생");
+        throw new Error("에러 발생");
       }
     }
   }

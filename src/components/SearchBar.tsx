@@ -1,12 +1,44 @@
 import React from "react";
 import styled from "styled-components";
 import { BiSearch } from "react-icons/bi";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { searchKeyword } from "../lib/states/searchKeyword";
+import { selectedIndex } from "@/lib/states/selectedIndex";
+import { searchResults } from "@/lib/states/searchResults";
 
 const SearchBar = () => {
+  const [inputValue, setInputValue] = useRecoilState(searchKeyword);
+  const [selected, setSelected] = useRecoilState(selectedIndex);
+  const searchResultsList = useRecoilValue(searchResults);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.nativeEvent.isComposing) return;
+    if (event.key === "ArrowUp" && selected > -1) {
+      setSelected((prev) => prev - 1);
+    }
+    if (event.key === "ArrowDown" && selected < searchResultsList.length - 1) {
+      setSelected((prev) => prev + 1);
+    }
+    if (event.key === "Enter" && selected >= 0) {
+      setInputValue(searchResultsList[selected].sickNm);
+      setSelected(-1);
+    }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+    setSelected(-1);
+  };
   return (
-    <SSearchBar>
+    <SSearchBar onSubmit={(event) => event.preventDefault()}>
       <SearchIcon />
-      <input type="text" placeholder="질환명을 입력해 주세요" />
+      <input
+        type="text"
+        placeholder="질환명을 입력해 주세요"
+        value={inputValue}
+        onKeyDown={handleKeyDown}
+        onChange={handleInputChange}
+      />
       <SButton type="submit">검색</SButton>
     </SSearchBar>
   );
