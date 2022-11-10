@@ -1,94 +1,49 @@
-# TypeScript CRA with husky
+# 한국 임상 정보 사이트의 검색창(검색어 추천 기능) 구현
 
-## 설치
+## 1. api 호출 최적화
 
-```shell
-npm install
-```
+### 1) 검색어에 대한 validation 로직 추가
 
-## 실행
+- 과제에 제시된 api 데이터가 한글로만 되어있어서 생각해본 방식
+- 공백, 영어, 숫자, 한글 자음만 입력된 경우에는 api 호출을 하지 않는다.
 
-```shell
-npm start
-```
-
-## husky script
-
-- ### pre-commit
-  commit 전에 prettier 적용
-- ### pre-push
-  git push전에 eslint 검사
-
-## prettier 설정
-
-```json
-// .prettierrc
-{
-  "trailingComma": "none",
-  "tabWidth": 2,
-  "semi": true,
-  "singleQuote": false,
-  "arrowParens": "always",
-  "printWidth": 80
-}
-```
-
-## eslint 설정
-
-```json
-// .eslintrc.json
-{
-  "env": {
-    "browser": true,
-    "es2021": true,
-    "node": true
-  },
-  "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
-  ],
-  "overrides": [],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaVersion": "latest",
-    "sourceType": "module"
-  },
-  "plugins": ["react", "@typescript-eslint"],
-  "rules": {
-    "no-var": "error",
-    "no-multiple-empty-lines": "error",
-    "no-console": ["error", { "allow": ["warn", "error", "info"] }],
-    "eqeqeq": "error",
-    "dot-notation": "warn",
-    "no-unused-vars": "error",
-    "quotes": ["error", "double"]
+```typescript
+export const inputValidation = (text: string): boolean => {
+  const regex = /^[가-힣]+$/;
+  if (regex.test(text)) {
+    return true;
   }
-}
+  return false;
+};
 ```
 
-## 절대경로 설정
+### 2) {검색 키워드 : 검색 결과 데이터(배열) } 형태로 캐싱
 
-### tsconfig.json
+- 캐시된 데이터가 없을 경우에만 요청을 api 요청을 보낸다.
 
-```json
-"baseUrl": ".",
-"paths": {
-    "@/*": ["src/*"]
-}
-```
+```typescript
+const useGetSearshList = () => {
+  const inputValue = useRecoilValue(searchKeyword);
+  const [searchResultsList, setSearchResultsList] =
+    useRecoilState(searchResults);
+  const [cache, setCache] = useState<ICache>({});
 
-### config-overrides.js
+  const getSearchResults = async (keyword: string) => {
+    if (!cache[keyword]) {
+      const data = await getSearchResultsService.search(keyword);
+      setSearchResultsList(data);
+      setCache((prev) => ({ ...prev, [keyword]: data }));
+    }
+    if (cache[keyword]) {
+      setSearchResultsList(cache[keyword]);
+    }
+  };
+  useEffect(() => {
+    if (inputValidation(inputValue)) {
+      getSearchResults(inputValue);
+    }
+  }, [inputValue]);
 
-```js
-/* eslint-disable @typescript-eslint/no-var-requires */
-const { addWebpackAlias, override } = require("customize-cra");
-const path = require("path");
-
-module.exports = override(
-  addWebpackAlias({
-    "@": path.resolve(__dirname, "src")
-  })
-);
+  return { inputValue, searchResultsList };
+};
 ```
