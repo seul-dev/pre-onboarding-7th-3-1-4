@@ -1,9 +1,10 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { BiSearch } from "react-icons/bi";
 import styled from "styled-components";
 import useGetSearshList from "../lib/hooks/useGetSearshList";
 import { useRecoilValue } from "recoil";
 import { selectedIndex } from "@/lib/states/selectedIndex";
+import { formatListItem } from "../lib/util/formatListItem";
 
 // 검색어 없을시 "검색어 없음"
 // 입력한 텍스트와 일치하는 부분은 볼드처리 <strong>
@@ -17,9 +18,12 @@ const DropDown = () => {
     <Container>
       <p>{DESCRIPTION}</p>
       {searchResultsList.map(({ sickCd, sickNm }, idx) => (
-        <ListItem key={sickCd} className={selected === idx ? "selected" : ""}>
-          {sickNm}
-        </ListItem>
+        <ListItem
+          key={sickCd}
+          className={selected === idx ? "selected" : ""}
+          sickNm={sickNm}
+          inputValue={inputValue}
+        />
       ))}
     </Container>
   ) : null;
@@ -43,15 +47,17 @@ const Container = styled.ul`
 `;
 
 interface ListItemProps {
-  children: ReactNode;
+  inputValue: string;
+  sickNm: string;
   className: string;
 }
 
-const ListItem = ({ children, className }: ListItemProps) => {
+const ListItem = ({ sickNm, inputValue, className }: ListItemProps) => {
+  const formatSickNm = formatListItem(sickNm, inputValue);
   return (
     <SListItem className={className}>
       <BiSearch />
-      {children}
+      {formatSickNm}
     </SListItem>
   );
 };
@@ -68,5 +74,8 @@ const SListItem = styled.li`
     font-size: 1.2rem;
     margin-right: 10px;
     color: ${({ theme }) => theme.color.gray};
+  }
+  & > strong {
+    font-weight: 700;
   }
 `;
